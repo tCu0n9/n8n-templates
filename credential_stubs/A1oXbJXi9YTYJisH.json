@@ -1,0 +1,12 @@
+{
+  "id": "A1oXbJXi9YTYJisH",
+  "name": "Ollama account",
+  "type": "ollamaApi",
+  "data": {
+    "baseUrl": ""
+  },
+  "ownedBy": {
+    "type": "personal",
+    "personalEmail": "t4cu0n9@gmail.com"
+  }
+}

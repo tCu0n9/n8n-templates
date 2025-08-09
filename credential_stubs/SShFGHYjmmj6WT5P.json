@@ -1,0 +1,13 @@
+{
+  "id": "SShFGHYjmmj6WT5P",
+  "name": "OpenRouter account 2",
+  "type": "openRouterApi",
+  "data": {
+    "apiKey": ""
+  },
+  "ownedBy": {
+    "type": "team",
+    "teamId": "HCMktTK13WwmbW2a",
+    "teamName": "AI VAPT"
+  }
+}

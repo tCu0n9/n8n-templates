@@ -1,0 +1,14 @@
+{
+  "id": "im85NEO6ROlcf7ME",
+  "name": "OpenAi account",
+  "type": "openAiApi",
+  "data": {
+    "apiKey": "",
+    "url": ""
+  },
+  "ownedBy": {
+    "type": "team",
+    "teamId": "HCMktTK13WwmbW2a",
+    "teamName": "AI VAPT"
+  }
+}

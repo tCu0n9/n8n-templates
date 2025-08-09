@@ -1,0 +1,543 @@
+{
+  "id": "b1T3KZHAkgR6FaNr",
+  "name": "Auto Post article via Facebook API",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ae5f92ba-839e-456e-b5c2-70849e8f3e30",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -400,
+        -40
+      ],
+      "id": "6a37ba6b-9e4a-46e7-b958-cfe8adc614a5",
+      "name": "Webhook",
+      "webhookId": "ae5f92ba-839e-456e-b5c2-70849e8f3e30"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e76fe772-46a5-4d0f-909c-1148c087039e",
+              "name": "content",
+              "value": "={{ $json.query.content }}",
+              "type": "string"
+            },
+            {
+              "id": "3e9bf9c1-9a7e-4e49-a1b5-fa2ed29304e7",
+              "name": "url_img",
+              "value": "={{ $json.query.url_img.split(\"\\n\") }}",
+              "type": "array"
+            },
+            {
+              "id": "4f54209d-e1e0-4777-accf-4df90df733db",
+              "name": "access_token",
+              "value": "={{ $json.query.access_token }}",
+              "type": "string"
+            },
+            {
+              "id": "435071ce-ef56-480b-8ae0-e1aba6fd416a",
+              "name": "page_id",
+              "value": "={{ $json.query.page_id }}",
+              "type": "string"
+            },
+            {
+              "id": "ae8c3b15-6d34-4b82-a2e7-981e042e8bb4",
+              "name": "type",
+              "value": "={{ $json.query.Type }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -180,
+        -40
+      ],
+      "id": "6457e62d-7c11-4791-868a-139ef66f47d0",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "1 media",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "39192e52-5e86-4f12-bcd6-e63120407840"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "1_img"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "1890b784-bd4a-4a38-944d-5256beffeaeb",
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "n media",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "n_imgs"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "eac27795-e663-4361-a959-38c6761b0c4a",
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "no media",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "without_img"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        40,
+        -40
+      ],
+      "id": "727796bc-6816-464c-9e9f-d5dd6c059420",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "url_img",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        260,
+        -40
+      ],
+      "id": "c6ecb660-1767-45a4-8cb2-da16ad25f845",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0c4c32f5-8bce-4514-9c1d-b436aafd2228",
+              "name": "media_fbid",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        920,
+        -40
+      ],
+      "id": "0e889dd7-cdf9-4a11-bf16-79db79f50c00",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "=all",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1140,
+        -40
+      ],
+      "id": "6ee12b3a-f2e1-455c-9541-973b557b0b1f",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.url_img[0] }}",
+          "mode": "url"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        260,
+        -240
+      ],
+      "id": "5d049ff4-f4a6-4506-a8ab-53d1d5236f28",
+      "name": "Download 1 img/vid",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "4zqCSrQZbtNnNogv",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.url_img }}",
+          "mode": "url"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        480,
+        -40
+      ],
+      "id": "62f0c399-a88b-49fe-9c29-c320ab115b6a",
+      "name": "Download images/videos",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "4zqCSrQZbtNnNogv",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v22.0",
+        "node": "={{ $('Switch').item.json.page_id }}/feed",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "published",
+                "value": "true"
+              },
+              {
+                "name": "message",
+                "value": "={{ $('Switch').item.json.content }}"
+              },
+              {
+                "name": "attached_media",
+                "value": "={{ $json.all }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        -40
+      ],
+      "id": "15f5547f-bfaf-4676-991d-7a6f3a5f78f0",
+      "name": "Post with multiple multimedia content",
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "IiC0VBClyv8mEtRt",
+          "name": "Facebook Graph account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v22.0",
+        "node": "={{ $('Switch').item.json.page_id }}/photos",
+        "sendBinaryData": true,
+        "binaryPropertyName": "data",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "message",
+                "value": "={{ $('Switch').item.json.content }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        480,
+        -240
+      ],
+      "id": "267f1d03-de3e-46a6-9134-954ca1a5c2b2",
+      "name": "Post with multimedia content",
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "IiC0VBClyv8mEtRt",
+          "name": "Facebook Graph account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v22.0",
+        "node": "={{ $('Switch').item.json.page_id }}/photos",
+        "sendBinaryData": true,
+        "binaryPropertyName": "data",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "published",
+                "value": "false"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        700,
+        -40
+      ],
+      "id": "7000fadb-2926-4125-970c-fd273c8abdd6",
+      "name": "Upload multiple multimedia content to Facebook",
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "IiC0VBClyv8mEtRt",
+          "name": "Facebook Graph account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v22.0",
+        "node": "={{ $('Switch').item.json.page_id }}/feed",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "published",
+                "value": "true"
+              },
+              {
+                "name": "message",
+                "value": "={{ $json.content }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        260,
+        160
+      ],
+      "id": "2f0e77f4-d601-4eef-8118-5acebd590857",
+      "name": "Post without multimedia content",
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "IiC0VBClyv8mEtRt",
+          "name": "Facebook Graph account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Guide\nUse Lark to create a Base document as a content repository with fields like:\n       - Content article\n       - Drive link\n       - Publish type (single image or video, multiple images and/or videos, no media)\n       - Scheduled time\n       - Access token of Facebook API\nStore media content links in Google Drive and reference API content. Then set up an automation to trigger posting at the scheduled time to an n8n webhook for publishing",
+        "height": 220,
+        "width": 1160
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        340
+      ],
+      "id": "d5a21c25-3d74-4c25-a904-62da05dbb564",
+      "name": "Sticky Note"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Download 1 img/vid",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Post without multimedia content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Download images/videos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Post with multiple multimedia content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download 1 img/vid": {
+      "main": [
+        [
+          {
+            "node": "Post with multimedia content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download images/videos": {
+      "main": [
+        [
+          {
+            "node": "Upload multiple multimedia content to Facebook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload multiple multimedia content to Facebook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "triggerCount": 1,
+  "versionId": "8e92f37c-ac79-4ed6-9d25-a9717b193326",
+  "owner": {
+    "type": "personal",
+    "personalEmail": "t4cu0n9@gmail.com"
+  },
+  "parentFolderId": null,
+  "isArchived": false
+}

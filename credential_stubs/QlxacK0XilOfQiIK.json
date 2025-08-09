@@ -1,0 +1,17 @@
+{
+  "id": "QlxacK0XilOfQiIK",
+  "name": "Google Sheets account 2",
+  "type": "googleSheetsOAuth2Api",
+  "data": {
+    "grantType": "",
+    "accessTokenUrl": "",
+    "clientId": "",
+    "clientSecret": "",
+    "authentication": ""
+  },
+  "ownedBy": {
+    "type": "team",
+    "teamId": "HCMktTK13WwmbW2a",
+    "teamName": "AI VAPT"
+  }
+}

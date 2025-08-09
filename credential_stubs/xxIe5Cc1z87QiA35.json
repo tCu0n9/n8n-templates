@@ -1,0 +1,12 @@
+{
+  "id": "xxIe5Cc1z87QiA35",
+  "name": "Google Gemini(PaLM) Api account",
+  "type": "googlePalmApi",
+  "data": {
+    "apiKey": ""
+  },
+  "ownedBy": {
+    "type": "personal",
+    "personalEmail": "t4cu0n9@gmail.com"
+  }
+}

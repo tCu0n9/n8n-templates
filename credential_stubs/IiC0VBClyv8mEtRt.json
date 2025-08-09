@@ -1,0 +1,12 @@
+{
+  "id": "IiC0VBClyv8mEtRt",
+  "name": "Facebook Graph account",
+  "type": "facebookGraphApi",
+  "data": {
+    "accessToken": ""
+  },
+  "ownedBy": {
+    "type": "personal",
+    "personalEmail": "t4cu0n9@gmail.com"
+  }
+}

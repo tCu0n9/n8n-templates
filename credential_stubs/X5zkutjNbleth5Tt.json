@@ -1,0 +1,12 @@
+{
+  "id": "X5zkutjNbleth5Tt",
+  "name": "Telegram account",
+  "type": "telegramApi",
+  "data": {
+    "accessToken": ""
+  },
+  "ownedBy": {
+    "type": "personal",
+    "personalEmail": "t4cu0n9@gmail.com"
+  }
+}

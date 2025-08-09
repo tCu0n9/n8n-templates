@@ -1,0 +1,20 @@
+{
+  "id": "4zqCSrQZbtNnNogv",
+  "name": "Google Drive account",
+  "type": "googleDriveOAuth2Api",
+  "data": {
+    "grantType": "",
+    "authUrl": "",
+    "accessTokenUrl": "",
+    "clientId": "",
+    "clientSecret": "",
+    "scope": "",
+    "authQueryParameters": "",
+    "authentication": "",
+    "notice": ""
+  },
+  "ownedBy": {
+    "type": "personal",
+    "personalEmail": "t4cu0n9@gmail.com"
+  }
+}

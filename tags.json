@@ -1,0 +1,22 @@
+{
+  "tags": [
+    {
+      "id": "MbUfAozAyoPxkMjp",
+      "name": "automation"
+    },
+    {
+      "id": "Zy6YAtjJVSvn02D9",
+      "name": "Facebook API"
+    }
+  ],
+  "mappings": [
+    {
+      "workflowId": "b1T3KZHAkgR6FaNr",
+      "tagId": "MbUfAozAyoPxkMjp"
+    },
+    {
+      "workflowId": "b1T3KZHAkgR6FaNr",
+      "tagId": "Zy6YAtjJVSvn02D9"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "id": "on21MAEBABMAnCLx",
+  "name": "Google Sheets account",
+  "type": "googleSheetsOAuth2Api",
+  "data": {
+    "grantType": "",
+    "accessTokenUrl": "",
+    "clientId": "",
+    "clientSecret": "",
+    "authentication": ""
+  },
+  "ownedBy": {
+    "type": "personal",
+    "personalEmail": "t4cu0n9@gmail.com"
+  }
+}
