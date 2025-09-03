@@ -1,0 +1,141 @@
+{
+  "id": "v3H6O8JAhNKtMei5",
+  "name": "MCP_VAPT",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -368,
+        -32
+      ],
+      "id": "d25c4f5c-7745-4a07-96a1-7fd9a7d5dfc4",
+      "name": "When chat message received",
+      "webhookId": "1a654225-8049-456f-adf0-c108a02ec730"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a helpful assistant. If you use tools of the MCP Server via the MCP Client, always check and format the output in a clear, human-readable way before sending it to humans."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -88,
+        -32
+      ],
+      "id": "ceeeb5f7-740f-4732-9ffb-c37671c68046",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "gpt-oss:20b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        192
+      ],
+      "id": "c07acea8-1a1f-4bc2-af5e-4cdb161e7e0a",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "ur4laP3De8diMBjD",
+          "name": "Ollama account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "endpointUrl": "http://172.16.69.138:9880/mcp",
+        "serverTransport": "httpStreamable",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.1,
+      "position": [
+        272,
+        192
+      ],
+      "id": "95bc3757-f158-4409-a01e-ffda7241d7e2",
+      "name": "MCP Client"
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -16,
+        192
+      ],
+      "id": "66ff9d5d-7211-441b-9e65-0480cedb1ff5",
+      "name": "Simple Memory"
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Client": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "triggerCount": 0,
+  "versionId": "94710c82-273d-44ba-9da8-d3cb77fdcb6c",
+  "owner": {
+    "type": "team",
+    "teamId": "6XAZpbMaIryIDqUD",
+    "teamName": "AI VAPT"
+  },
+  "parentFolderId": null,
+  "isArchived": false
+}

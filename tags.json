@@ -7,6 +7,14 @@
     {
       "id": "Zy6YAtjJVSvn02D9",
       "name": "Facebook API"
+    },
+    {
+      "id": "QlE1llMd59QaRYwv",
+      "name": "VAPT"
+    },
+    {
+      "id": "9AxV3YexnSy9bnsQ",
+      "name": "Security"
     }
   ],
   "mappings": [
@@ -17,6 +25,18 @@
     {
       "workflowId": "b1T3KZHAkgR6FaNr",
       "tagId": "Zy6YAtjJVSvn02D9"
+    },
+    {
+      "workflowId": "v3H6O8JAhNKtMei5",
+      "tagId": "9AxV3YexnSy9bnsQ"
+    },
+    {
+      "workflowId": "v3H6O8JAhNKtMei5",
+      "tagId": "QlE1llMd59QaRYwv"
+    },
+    {
+      "workflowId": "v3H6O8JAhNKtMei5",
+      "tagId": "MbUfAozAyoPxkMjp"
     }
   ]
 }
