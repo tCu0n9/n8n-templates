@@ -4,32 +4,23 @@
   "nodes": [
     {
       "parameters": {
+        "endpointUrl": "http://192.168.16.71:3000/mcp/shodan-mcp",
+        "serverTransport": "httpStreamable",
+        "include": "selected",
+        "includeTools": [
+          "shodan-mcp-dns-lookup",
+          "shodan-mcp-domain-info"
+        ],
         "options": {}
       },
-      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
-      "typeVersion": 1.3,
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.1,
       "position": [
-        -368,
-        -32
+        -2432,
+        392
       ],
-      "id": "d25c4f5c-7745-4a07-96a1-7fd9a7d5dfc4",
-      "name": "When chat message received",
-      "webhookId": "1a654225-8049-456f-adf0-c108a02ec730"
-    },
-    {
-      "parameters": {
-        "options": {
-          "systemMessage": "You are a helpful assistant. If you use tools of the MCP Server via the MCP Client, always check and format the output in a clear, human-readable way before sending it to humans."
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.agent",
-      "typeVersion": 2.2,
-      "position": [
-        -88,
-        -32
-      ],
-      "id": "ceeeb5f7-740f-4732-9ffb-c37671c68046",
-      "name": "AI Agent"
+      "id": "93bb9f03-e1c3-4443-96ad-889968334b42",
+      "name": "Shodan MCP"
     },
     {
       "parameters": {
@@ -40,9 +31,9 @@
       "typeVersion": 1,
       "position": [
         -144,
-        192
+        96
       ],
-      "id": "c07acea8-1a1f-4bc2-af5e-4cdb161e7e0a",
+      "id": "8ee836e3-8f54-4253-b001-1048355bcb8e",
       "name": "Ollama Chat Model",
       "credentials": {
         "ollamaApi": {
@@ -53,36 +44,864 @@
     },
     {
       "parameters": {
-        "endpointUrl": "http://172.16.69.138:9880/mcp",
-        "serverTransport": "httpStreamable",
+        "mode": "raw",
+        "jsonOutput": "={{ $json.output }}",
         "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -720,
+        24
+      ],
+      "id": "62cb7ba8-90d8-4ab6-b559-9e4ed5a5a10f",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -496,
+        24
+      ],
+      "id": "01dc82af-e274-4de3-b04d-4153f139fcfb",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -2688,
+        392
+      ],
+      "id": "083d9eb1-81e9-4c0e-9f7d-0223e077f064",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "y1BCGVvobUaf3X6H",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "endpointUrl": "http://192.168.16.71:3000/mcp/kali-mcp1",
+        "serverTransport": "httpStreamable",
+        "include": "selected",
+        "includeTools": [
+          "nmap_scan"
+        ],
+        "options": {
+          "timeout": 3600000
+        }
       },
       "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
       "typeVersion": 1.1,
       "position": [
-        272,
-        192
+        -16,
+        600
       ],
-      "id": "95bc3757-f158-4409-a01e-ffda7241d7e2",
-      "name": "MCP Client"
+      "id": "f42491ff-b41d-4698-9460-9fed6c6284ad",
+      "name": "Kali MCP"
     },
     {
       "parameters": {
-        "contextWindowLength": 10
+        "promptType": "define",
+        "text": "=scan domain {{ $json.Request.target }}",
+        "options": {
+          "systemMessage": "=You are a talented AI assistant. \nWhen receiving a user request to scan a domain or IP, you will use MCP to process the request. \nAfter receiving the results from MCP, return them strictly in the following JSON format:\n\n{\"result_scan\": {\n    \"domain\": \"<domain>\",\n    \"start_time\":\"<start-time-scan>\"\n    {\n      \"subdomain\": \"<subdomain1>\",\n      \"type\": \"<type1>\",\n      \"value\": \"<ip>\"\n    },\n    {\n      \"subdomain\": \"<subdomain2>\",\n      \"type\": \"<type2>\",\n      \"value\": \"<ip>\"\n    },\n    {\n      \"subdomain\": \"<subdomain3>\",\n      \"type\": \"<type3>\",\n      \"value\": \"<ip>\"\n    },\n  ]\n}}\n\nRules:\n1. Output must always be a valid JSON object starting with {\"result_scan\":{...}}.  \n2. ABSOLUTELY DO NOT use markdown, DO NOT use code blocks, DO NOT escape characters.  \n3. Do not add explanations, comments, or extra fields.  \n4. Each record must contain exactly \"subdomain\", \"type\", and \"value\".  \n5. Do not include duplicate records.  \n6. If no data is found, return {\"result_scan\": {}}.  \n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -2632,
+        168
+      ],
+      "id": "948e7a6e-5b1b-4668-8cca-e03227e416cd",
+      "name": "AI Agent Scan Domain"
+    },
+    {
+      "parameters": {
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1,
+      "position": [
+        -3936,
+        528
+      ],
+      "id": "2bc25ca0-325f-4fa1-a907-5166bd32d950",
+      "name": "Respond to Chat",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=You are a helpful assistant.  \nAnalyze the user’s request to determine which type of scan they want to perform from the following options:  \n- Scan IP  \n- Scan Domain  \n- Scan Website  \n\nIf you can identify the scan type from the request, ask the user to confirm it before proceeding."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -4288,
+        624
+      ],
+      "id": "a69f7a31-cb59-4043-bece-338efcc6223d",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -3416,
+        848
+      ],
+      "id": "34946107-1ff6-4368-8fb6-8b9f1d1bf3e4",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "y1BCGVvobUaf3X6H",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8a6499c7-17a1-426e-b02c-8489c2cdd09e",
+              "leftValue": "={{ $json.chatInput }}",
+              "rightValue": "yes",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "775a604f-b9f3-4d3a-9ef5-8e91499936dc",
+              "leftValue": "=",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": false
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -3712,
+        624
+      ],
+      "id": "8ae5c478-4e86-4c4c-8215-3b35607e1e0c",
+      "name": "If",
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "f7c4cc14-d075-4427-a998-3cf0c8ed1a26",
+                    "leftValue": "={{ $json.Request.type }}",
+                    "rightValue": "=scan domain",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "scan domain"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.Request.type }}",
+                    "rightValue": "scan IP",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "339e456f-093d-468b-9a7d-64c7ec808048"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "scan IP"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "ebc4be06-7022-4d89-97c3-49ca1d33d360",
+                    "leftValue": "={{ $json.Request.type }}",
+                    "rightValue": "scan website",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "scan website"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -2912,
+        608
+      ],
+      "id": "ea057681-b286-4ac3-a5d1-950b1dddcd1f",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Here is the user's request: {{ $('Chat box').item.json.chatInput }}\nHere is the confirmation question: {{ $('AI Agent').item.json.output }}  \nHere is the user’s confirmation: {{ $json.chatInput }}  \nPlease determine the correct scan type and return the result in JSON format.  \n",
+        "options": {
+          "systemMessage": "=You are a helpful assistant.  \nYour output must always be in the following JSON format without markdown and code block:  \n\n{\n  \"Request\": {\n       \"type\": \"<type scan>\", \n       \"target\": \"<target scan>\", \n       \"note\": \"<option scan>\"\n   }\n}\n\n- <type scan> must be exactly one of these three values: \"scan IP\", \"scan domain\", or \"scan website\".  \n- <target scan> must be the IP, domain, or URL provided by the user.  \n- <option scan> must capture any additional scan request from the user (for example: \"scan service and version on port 22; scan OS; ...\").  \n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -3488,
+        624
+      ],
+      "id": "6166ba4d-963b-499b-b100-9dc2191ef97b",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "model": "gpt-oss:20b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -4216,
+        848
+      ],
+      "id": "fe06461d-0a03-4c8d-828c-f881772c26b5",
+      "name": "Ollama Chat Model1",
+      "credentials": {
+        "ollamaApi": {
+          "id": "ur4laP3De8diMBjD",
+          "name": "Ollama account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3136,
+        624
+      ],
+      "id": "10dc34a4-d024-4852-9485-2430cefd4ba2",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -2624,
+        896
+      ],
+      "id": "13cc03d7-ce98-4384-9f94-e1e716b20a27",
+      "name": "Google Gemini Chat Model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "y1BCGVvobUaf3X6H",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "endpointUrl": "http://172.16.69.138:9880/mcp",
+        "serverTransport": "httpStreamable",
+        "include": "selected",
+        "includeTools": [
+          "nmap_scan"
+        ],
+        "options": {
+          "timeout": 3600000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.1,
+      "position": [
+        -2496,
+        896
+      ],
+      "id": "06822c37-0da7-485c-92c2-edb68396195e",
+      "name": "Kali MCP1"
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseMode": "responseNodes"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -4512,
+        624
+      ],
+      "id": "6d72ed89-834c-4e6d-840c-2837edfeee41",
+      "name": "Chat box",
+      "webhookId": "1a654225-8049-456f-adf0-c108a02ec730"
+    },
+    {
+      "parameters": {
+        "message": "=Do you want to scan the IPs found in the domain scan results?",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1,
+      "position": [
+        -2160,
+        272
+      ],
+      "id": "160ca2ec-71f6-437a-bc99-4c2fa5e2b84f",
+      "name": "Respond to Chat1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "dfc6e123-9b08-44de-9f96-77024decd3ce",
+              "leftValue": "={{ $json.chatInput }}",
+              "rightValue": "yes",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1872,
+        272
+      ],
+      "id": "4e629ce5-442d-42a6-813b-60b3dfe72f8e",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -1000,
+        248
+      ],
+      "id": "ceab2ac5-6e4d-4334-99a1-1fbe19e4f2f9",
+      "name": "Google Gemini Chat Model3",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "y1BCGVvobUaf3X6H",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        640
+      ],
+      "id": "f1080437-8aa8-4a21-8cdd-27664a5c88d5",
+      "name": "Google Gemini Chat Model4",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "y1BCGVvobUaf3X6H",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Extract all IP from this data: {{ $('AI Agent Scan Domain').item.json.output }}",
+        "options": {
+          "systemMessage": "=You are a talented AI assistant.  \nYou will receive the results from another node.  \nFrom this data, extract only the IP addresses and return them strictly in the following JSON format:\n\n{\n  \"IP\": [\n    \"IP1\",\n    \"IP2\",\n    \"IP3\"\n  ]\n}\n\nRules:\n1. Output must always be a valid JSON object with the key \"IP\".  \n2. Do not use markdown, code blocks, or escape characters.  \n3. Do not add explanations, comments, or extra fields.  \n4. Keep only IP addresses inside the \"IP\" array.  \n5. Remove any duplicate IP addresses — each IP must appear only once.  \n6. If no IP addresses are found, you must still return: { \"IP\": [] }.  \n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -1072,
+        24
+      ],
+      "id": "b824b4c4-da6e-428f-836a-016c88f42b7a",
+      "name": "Extract IPs"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -1576,
+        648
+      ],
+      "id": "c6a9d253-5716-4761-a1c3-231af07ddcae",
+      "name": "Google Gemini Chat Model6",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "y1BCGVvobUaf3X6H",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -1576,
+        144
+      ],
+      "id": "c5c1a55a-948f-4e84-9c50-ce40c6741eff",
+      "name": "Google Gemini Chat Model7",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "y1BCGVvobUaf3X6H",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Here is the JSON input containing the results of domain scans:  \n{{ $('AI Agent Scan Domain').item.json.output }}\nPlease generate the scan report according to the required format.  \n",
+        "options": {
+          "systemMessage": "=You are a helpful assistant.  \nYour task is to generate a structured scan report in plain text using the exact format below.  \nDo not ask for clarification. Do not change the structure. Always follow the format exactly.  \nDo not shorten, summarize, or omit any data. Every record in the JSON must appear in the report.  \n\n# **Domain Scan Report: <domain>**\n\n## **1. Overview of the entire scan process**  \n- Target domain: <domain>  \n- Number of subdomains: <number>  \n- Start scan timestamp: <start-scan-timestamp>  \n\n## **2. Detailed results for Scan**  \nThe table must always include the header row:  \n\nno | subdomain | type | value  \n\nThen list each record on a new line under the header, one record per row. Example format:  \n\n1 | www.example.com  | A     | 192.0.2.1  \n2 | mail.example.com | MX    | mail.example.com (priority: 10)  \n3 | blog.example.com | CNAME | example.github.io  \n4 | dev.example.com  | A     | 192.0.2.2  \n\nRules:  \n- Title must always include the domain: # **Domain Scan Report: <domain>** (replace <domain> with the actual domain).  \n- Main sections must be smaller than the title: use ## and bold (## **...**).  \n- Use bullet points (-) in section 1 exactly as shown above.  \n- The table must always begin with the header row: (no | subdomain | type | value).  \n- Use the subdomain column as follows: if the subdomain is empty, display the domain itself; otherwise, combine subdomain and domain into one string (e.g., subdomain \"api\" + domain \"example.com\" → \"api.example.com\", empty subdomain + domain \"example.com\" → \"example.com\").\n- Always write each record on a separate line under the header row. Do not merge multiple records into a single line.\n- Number the rows sequentially starting from 1.  \n- Replace <domain>, <number>, <timestamp> with actual values from JSON.\n- Do not use markdown code blocks or escaping.  \n- Do not add explanations, comments, or extra information.  \n- If some information is missing in the JSON, leave the field blank but preserve the structure. \n- **All data from JSON must be included. Do not skip, shorten, or collapse entries.**  \n- **If JSON is empty or contains no records, still generate the full report structure with empty fields and keep the table header row.**  \n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -1648,
+        424
+      ],
+      "id": "2b2e4120-ef7a-439a-9167-df458f26e3ba",
+      "name": "AI Agent Gen Domain Report"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Here is the JSON input containing the results of domain scans:  \n{{ $('AI Agent Scan Domain').item.json.output }}\nPlease generate the scan report according to the required format.  \n",
+        "options": {
+          "systemMessage": "=You are a helpful assistant.  \nYour task is to generate a structured scan report in plain text using the exact format below.  \nDo not ask for clarification. Do not change the structure. Always follow the format exactly.  \nDo not shorten, summarize, or omit any data. Every record in the JSON must appear in the report.  \n\n# **Domain Scan Report: <domain>**\n\n## **1. Overview of the entire scan process**  \n- Target domain: <domain>  \n- Number of subdomains: <number>  \n- Start scan timestamp: <start-scan-timestamp>  \n\n## **2. Detailed results for Scan**  \nThe table must always include the header row:  \n\nno | subdomain | type | value  \n\nThen list each record on a new line under the header, one record per row. Example format:  \n\n1 | www.example.com  | A     | 192.0.2.1  \n2 | mail.example.com | MX    | mail.example.com (priority: 10)  \n3 | blog.example.com | CNAME | example.github.io  \n4 | dev.example.com  | A     | 192.0.2.2  \n\nRules:  \n- Title must always include the domain: # **Domain Scan Report: <domain>** (replace <domain> with the actual domain).  \n- Main sections must be smaller than the title: use ## and bold (## **...**).  \n- Use bullet points (-) in section 1 exactly as shown above.  \n- The table must always begin with the header row: (no | subdomain | type | value).  \n- Use the subdomain column as follows: if the subdomain is empty, display the domain itself; otherwise, combine subdomain and domain into one string (e.g., subdomain \"api\" + domain \"example.com\" → \"api.example.com\", empty subdomain + domain \"example.com\" → \"example.com\").\n- Always write each record on a separate line under the header row. Do not merge multiple records into a single line.\n- Number the rows sequentially starting from 1.  \n- Replace <domain>, <number>, <timestamp> with actual values from JSON.\n- Do not use markdown code blocks or escaping.  \n- Do not add explanations, comments, or extra information.  \n- If some information is missing in the JSON, leave the field blank but preserve the structure. \n- **All data from JSON must be included. Do not skip, shorten, or collapse entries.**  \n- **If JSON is empty or contains no records, still generate the full report structure with empty fields and keep the table header row.**  \n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -1648,
+        -80
+      ],
+      "id": "7a873792-f4e9-4348-a7f8-0beaac00833c",
+      "name": "AI Agent Gen Domain Report1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Here is the JSON input containing the results of Nmap scans for one or multiple IP addresses:  \n{{ $('AI Agent Scan IPs 1').item.json.output }}  \n\nPlease generate the scan report according to the required format.  \n",
+        "options": {
+          "systemMessage": "=You are a helpful assistant.  \nYour task is to generate a structured report in plain text using the following format:  \n\n# **IPs Scan Report: <domain>**\n\n## **1. Overview of the entire scan process**  \n- Total number of IPs scanned  \n- List of all scanned IPs  \n- Number of open ports for each IP  \n- Overall scan start time and end time  \n\n## **2. Detailed results for each IP**  \n### *2.x Scan result for <IP>*  \n- Target: <IP address>  \n- Scan mode used (e.g., SYN scan, service/version detection)  \n- Scan start time and end time  \n- Detected Operating System (if available)  \n- Traceroute / Hop Count (if available)  \n- Open ports list: for each port include  \n  - Port number  \n  - Protocol  \n  - State (open/closed/filtered)  \n  - Service name  \n  - Service version (if detected)  \n  - Banner / Extra Info (if available)  \n  - Related CVEs (if available) with severity level (Low/Medium/High/Critical)  \n  - NSE script results (if available)  \n- Additional notes (if Nmap provides reasons for state or anomalies)  \n\nRules:  \n- Title must be the largest heading: # **IPs Scan Report: <domain>**.  \n- Main sections must be slightly smaller than the title: use ## and bold (## **...**).  \n- Subsections like 2.x must be smaller than main sections: use ### and *italic* (### *...*).  \n- Use bullet points `-` for listing items clearly.  \n- Keep the report strictly human-readable and structured.  \n- Extract all data accurately from the JSON without adding any commentary or explanations.  \n- If some information is missing in the JSON, leave the field blank but preserve the structure.  \n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -216,
+        -128
+      ],
+      "id": "52a4cd82-dbb8-4034-ba14-d7702dd38e6f",
+      "name": "AI Agent Gen IPs Report"
+    },
+    {
+      "parameters": {
+        "model": "gpt-oss:20b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -2152,
+        896
+      ],
+      "id": "69a060d8-3782-4402-a814-09e8d0e04ff9",
+      "name": "Ollama Chat Model3",
+      "credentials": {
+        "ollamaApi": {
+          "id": "ur4laP3De8diMBjD",
+          "name": "Ollama account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Here is the JSON input containing the results of Nmap scans for one or multiple IP addresses:  \n{{ $('AI Agent Scan IPs 1').item.json.output }}  \n\nPlease generate the scan report according to the required format.  \n",
+        "options": {
+          "systemMessage": "=You are a helpful assistant.  \nYour task is to generate a structured report in plain text using the following format:  \n\n# **IPs Scan Report: <domain>**\n\n## **1. Overview of the entire scan process**  \n- Total number of IPs scanned  \n- List of all scanned IPs  \n- Number of open ports for each IP  \n- Overall scan start time and end time  \n\n## **2. Detailed results for each IP**  \n### *2.x Scan result for <IP>*  \n- Target: <IP address>  \n- Scan mode used (e.g., SYN scan, service/version detection)  \n- Scan start time and end time  \n- Detected Operating System (if available)  \n- Traceroute / Hop Count (if available)  \n- Open ports list: for each port include  \n  - Port number  \n  - Protocol  \n  - State (open/closed/filtered)  \n  - Service name  \n  - Service version (if detected)  \n  - Banner / Extra Info (if available)  \n  - Related CVEs (if available) with severity level (Low/Medium/High/Critical)  \n  - NSE script results (if available)  \n- Additional notes (if Nmap provides reasons for state or anomalies)  \n\nRules:  \n- Title must be the largest heading: # **IPs Scan Report: <domain>**.  \n- Main sections must be slightly smaller than the title: use ## and bold (## **...**).  \n- Subsections like 2.x must be smaller than main sections: use ### and *italic* (### *...*).  \n- Use bullet points `-` for listing items clearly.  \n- Keep the report strictly human-readable and structured.  \n- Extract all data accurately from the JSON without adding any commentary or explanations.  \n- If some information is missing in the JSON, leave the field blank but preserve the structure.  \n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -2224,
+        672
+      ],
+      "id": "65012b28-2148-43a4-b355-389803187254",
+      "name": "AI Agent Gen IPs Report1"
+    },
+    {
+      "parameters": {
+        "message": "={{ $json.output }}",
+        "waitUserReply": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1,
+      "position": [
+        -1296,
+        24
+      ],
+      "id": "7b773963-ac9b-4fc0-aaec-2f92876a6813",
+      "name": "Result Domain Scan 2"
+    },
+    {
+      "parameters": {
+        "message": "={{ $json.output }}",
+        "waitUserReply": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1,
+      "position": [
+        -1296,
+        424
+      ],
+      "id": "c706f914-6aea-415d-89da-26eeeced7daa",
+      "name": "Result Domain Scan 1"
+    },
+    {
+      "parameters": {
+        "message": "={{ $json.output }}",
+        "waitUserReply": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1,
+      "position": [
+        192,
+        -24
+      ],
+      "id": "7e05dd3e-035b-4711-8a6b-5a4c6080ad0d",
+      "name": "Result IPs Scan 1"
+    },
+    {
+      "parameters": {
+        "message": "={{ $json.output }}",
+        "waitUserReply": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1,
+      "position": [
+        -1872,
+        672
+      ],
+      "id": "da0a876c-12e8-4948-94ba-4e42f9fbcce2",
+      "name": "Result IPs Scan 2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=scan ip {{ $json.Request.target }}",
+        "options": {
+          "systemMessage": "=You are a helpful assistant.  \nWhen you receive a JSON array of IP addresses, use the Nmap tool to perform a full scan (ports 1–5000) sequentially on each IP address. Finish scanning one IP before moving to the next.  \nEnable the following options for maximum information:  \n- Service and version detection (-sV --version-all)  \n- OS detection (-O)  \n- Script scan with vulnerability scripts (--script vuln)  \n- Traceroute (--traceroute)  \n\nAfter completing the scan for all IPs, return the results strictly in JSON format with the following structure:  \n\n{\n  \"Overview\": {\n    \"TotalIPsScanned\": <number>,\n    \"ScannedIPs\": [\"IP1\", \"IP2\", \"IP3\"],\n    \"OpenPortsSummary\": {\n      \"IP1\": <number_of_open_ports>,\n      \"IP2\": <number_of_open_ports>\n    },\n    \"ScanStartTime\": \"<timestamp>\",\n    \"ScanEndTime\": \"<timestamp>\"\n  },\n  \"Result\": {\n    \"IP1\": {\n      \"Target\": \"<IP address>\",\n      \"ScanMode\": \"<Options and tools used for scan>\",\n      \"ScanTime\": {\n        \"Start\": \"<timestamp>\",\n        \"End\": \"<timestamp>\"\n      },\n      \"OS\": \"<detected_operating_system_or_blank>\",\n      \"Traceroute\": \"<hops_or_blank>\",\n      \"Note\": \"<general_notes_or_blank>\",\n      \"OpenPorts\": [\n        {\n          \"Port\": <port_number>,\n          \"Protocol\": \"<protocol>\",\n          \"State\": \"<open/closed/filtered>\",\n          \"Service\": \"<service_name>\",\n          \"Version\": \"<service_version_or_blank>\",\n          \"Banner\": \"<banner_or_extra_info_or_blank>\",\n          \"Reason\": \"<reason_for_state_or_blank>\",\n          \"CVEs\": [\n            {\n              \"CVE\": \"<cve_id>\",\n              \"Severity\": \"<severity_level>\",\n              \"Note\": \"<extra_details_or_blank>\"\n            }\n          ],\n          \"NSE\": [\n            {\n              \"Script\": \"<script_name>\",\n              \"Output\": \"<script_result>\"\n            }\n          ]\n        }\n      ]\n    },\n    \"IP2\": {\n      \"Target\": \"<IP address>\",\n      \"ScanMode\": \"<Options and tools used for scan>\",\n      \"ScanTime\": {\n        \"Start\": \"<timestamp>\",\n        \"End\": \"<timestamp>\"\n      },\n      \"OS\": \"<detected_operating_system_or_blank>\",\n      \"Traceroute\": \"<hops_or_blank>\",\n      \"Note\": \"<general_notes_or_blank>\",\n      \"OpenPorts\": [\n        {\n          \"Port\": <port_number>,\n          \"Protocol\": \"<protocol>\",\n          \"State\": \"<open/closed/filtered>\",\n          \"Service\": \"<service_name>\",\n          \"Version\": \"<service_version_or_blank>\",\n          \"Banner\": \"<banner_or_extra_info_or_blank>\",\n          \"Reason\": \"<reason_for_state_or_blank>\",\n          \"CVEs\": [\n            {\n              \"CVE\": \"<cve_id>\",\n              \"Severity\": \"<severity_level>\",\n              \"Note\": \"<extra_details_or_blank>\"\n            }\n          ],\n          \"NSE\": [\n            {\n              \"Script\": \"<script_name>\",\n              \"Output\": \"<script_result>\"\n            }\n          ]\n        }\n      ]\n    }\n  }\n}\n\nRules:  \n- Always return only valid JSON data without any explanations.  \n- Preserve the full structure even if some fields are empty (leave them as blank or empty arrays).  \n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -2632,
+        672
+      ],
+      "id": "f9d9573b-a391-4a78-bda9-9a56babd4f25",
+      "name": "AI Agent Scan IPs 2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=scan ip {{ $json.IP }}",
+        "options": {
+          "systemMessage": "=You are a helpful assistant.  \nWhen you receive a JSON array of IP addresses, use the Nmap tool to perform a full scan (ports 1–5000) sequentially on each IP address. Finish scanning one IP before moving to the next.  \n\nAfter completing the scan for all IPs, return the results strictly in JSON format with the following structure:  \n\n{\n  \"Overview\": {\n    \"TotalIPsScanned\": <number>,\n    \"ScannedIPs\": [\"IP1\", \"IP2\", \"IP3\"],\n    \"OpenPortsSummary\": {\n      \"IP1\": <number_of_open_ports>,\n      \"IP2\": <number_of_open_ports>\n    },\n    \"ScanStartTime\": \"<timestamp>\"\n  },\n  \"Result\": {\n    \"IP1\": {\n      \"Target\": \"<IP address>\",\n      \"ScanMode\": \"<Options and tools used for scan>\",\n      \"ScanTime\": {\n        \"Start\": \"<timestamp>\",\n        \"End\": \"<timestamp>\"\n      },\n      \"Note\": \"<note>\",\n      \"OpenPorts\": [\n        {\n          \"Port\": <port_number>,\n          \"Protocol\": \"<protocol>\",\n          \"Service\": \"<service_name>\",\n          \"Version\": \"<service_version>\",\n          \"Note\": \"<note>\",\n          \"CVEs\": [\n            {\n              \"CVE\": \"<cve_id>\",\n              \"Severity\": \"<severity_level>\",\n              \"Note\": \"<note>\"\n            }\n          ]\n        }\n      ]\n    },\n    \"IP2\": {\n      \"Target\": \"<IP address>\",\n      \"ScanMode\": \"<Options and tools used for scan>\",\n      \"ScanTime\": {\n        \"Start\": \"<timestamp>\",\n        \"End\": \"<timestamp>\"\n      },\n      \"Note\": \"<note>\",\n      \"OpenPorts\": [\n        {\n          \"Port\": <port_number>,\n          \"Protocol\": \"<protocol>\",\n          \"Service\": \"<service_name>\",\n          \"Version\": \"<service_version>\",\n          \"Note\": \"<note>\",\n          \"CVEs\": [\n            {\n              \"CVE\": \"<cve_id>\",\n              \"Severity\": \"<severity_level>\",\n              \"Note\": \"<note>\"\n            }\n          ]\n        }\n      ]\n    }\n  }\n}\n\nReturn only valid JSON data without any explanations.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -208,
+        272
+      ],
+      "id": "3667c963-a9dc-43db-9d5f-6a14d5834511",
+      "name": "AI Agent Scan IPs 1"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Chat box').item.json.sessionId }}"
       },
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
       "position": [
-        -16,
-        192
+        -2560,
+        392
       ],
-      "id": "66ff9d5d-7211-441b-9e65-0480cedb1ff5",
+      "id": "88ef12fb-fd6a-4c28-b518-e5e0d0a10a5d",
       "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Chat box').item.json.sessionId }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -592,
+        960
+      ],
+      "id": "32bd4561-6e57-4a79-bf9f-b01fad572b8e",
+      "name": "Simple Memory1"
     }
   ],
   "connections": {
-    "When chat message received": {
+    "Shodan MCP": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent Scan Domain",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent Gen IPs Report",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
       "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "AI Agent Gen IPs Report",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent Scan IPs 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent Scan Domain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Kali MCP": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent Scan IPs 1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent Scan Domain": {
+      "main": [
+        [
+          {
+            "node": "Respond to Chat1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Chat": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ],
         [
           {
             "node": "AI Agent",
@@ -92,7 +911,7 @@
         ]
       ]
     },
-    "Ollama Chat Model": {
+    "Ollama Chat Model1": {
       "ai_languageModel": [
         [
           {
@@ -103,12 +922,247 @@
         ]
       ]
     },
-    "MCP Client": {
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "AI Agent Scan Domain",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent Scan IPs 2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent Scan IPs 2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Kali MCP1": {
       "ai_tool": [
         [
           {
-            "node": "AI Agent",
+            "node": "AI Agent Scan IPs 2",
             "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chat box": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Chat1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent Gen Domain Report1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent Gen Domain Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Extract IPs",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent Scan IPs 1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract IPs": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model6": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent Gen Domain Report",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model7": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent Gen Domain Report1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent Gen Domain Report": {
+      "main": [
+        [
+          {
+            "node": "Result Domain Scan 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent Gen Domain Report1": {
+      "main": [
+        [
+          {
+            "node": "Result Domain Scan 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent Gen IPs Report1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent Gen IPs Report1": {
+      "main": [
+        [
+          {
+            "node": "Result IPs Scan 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Result Domain Scan 2": {
+      "main": [
+        [
+          {
+            "node": "Extract IPs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent Gen IPs Report": {
+      "main": [
+        [
+          {
+            "node": "Result IPs Scan 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent Scan IPs 2": {
+      "main": [
+        [
+          {
+            "node": "AI Agent Gen IPs Report1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent Scan IPs 1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
             "index": 0
           }
         ]
@@ -118,11 +1172,21 @@
       "ai_memory": [
         [
           {
-            "node": "AI Agent",
+            "node": "AI Agent Scan Domain",
             "type": "ai_memory",
             "index": 0
           }
         ]
+      ]
+    },
+    "Result Domain Scan 1": {
+      "main": [
+        []
+      ]
+    },
+    "Simple Memory1": {
+      "ai_memory": [
+        []
       ]
     }
   },
@@ -130,7 +1194,7 @@
     "executionOrder": "v1"
   },
   "triggerCount": 0,
-  "versionId": "94710c82-273d-44ba-9da8-d3cb77fdcb6c",
+  "versionId": "a00565d6-2b38-4642-8318-099d94a77afb",
   "owner": {
     "type": "team",
     "teamId": "6XAZpbMaIryIDqUD",
